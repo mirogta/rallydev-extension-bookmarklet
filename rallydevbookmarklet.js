@@ -112,6 +112,12 @@ window.open = function (open, $) {
 		html += '._container ._help {margin-top:20px; color: #33AA33;}';
 		html += '</style>';
 		html += '<div class="_title">Create Task</div>';
+		html += '<div class="_names">';
+		html += '<button data-skill="Development" data-name="DEV: ">DEV</button>';
+		html += '<button data-skill="Development" data-name="DEV: code review" data-next="true">DEV: code review</button>';
+		html += '<button data-skill="Test" data-name="QA: ">QA</button>';
+		html += '<button data-skill="Test" data-name="QA: test review" data-next="true">QA: test review</button>';
+		html += '</div>';
 		html += '<div><label>Name:</label><input type="text" class="_name"/></div>';
 		html += '<div><label>Hours:</label><input type="text" class="_hours"/></div>';
 		html += '<div><label>Ready:</label>&#10004;</div>';
@@ -122,6 +128,7 @@ window.open = function (open, $) {
 		html += '<button data-target="save_btn">Save</button>';
 		html += '<button data-target="cancel_btn">Cancel</button>';
 		html += '</div>';
+		html += '<div class="_help">Press Esc key to toggle between the original and optimised view.</div>';
 		html += '</div>';
 		console.log('- adding new form');
 		$(html).insertBefore(form);
@@ -129,7 +136,20 @@ window.open = function (open, $) {
 		var container = $('._container');
 
 		toggleView(container, form);
-		
+
+		console.log('- name buttons');
+		$('._names button', container).on('click', function() {
+			var skill = $(this).data('skill');
+			var name = $(this).data('name');
+			var next = $(this).data('next');
+			$('select option[value="'+skill+'"]').parent().val(skill);
+			$('input._name', container).val(name).trigger('keyup').focus();
+			$('span._skill', container).text(skill);
+			if(next) {
+				$('._hours', container).focus();
+			}
+		});
+
 		console.log('- focus on name');
 		$('input._name', container).focus();
 		
@@ -150,6 +170,13 @@ window.open = function (open, $) {
 			var target = $(this).data('target');
 			$('#'+target).click();
 		});
+		
+		console.log('- check Ready');
+		$('input[name="ready"]').prop('checked',true);
+		console.log('- hide Owner row');
+		$('select[name="owner"]').parents('tr').hide();
+		console.log('- pre-select Development skill');
+		$('select option[value="Development"]').parent().val('Development');
 	}
 	
 	function toggleView(container, form) {
