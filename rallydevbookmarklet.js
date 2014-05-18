@@ -128,6 +128,8 @@ window.open = function (open, $) {
 
 		var container = $('._container');
 
+		toggleView(container, form);
+		
 		console.log('- focus on name');
 		$('input._name', container).focus();
 		
@@ -147,6 +149,20 @@ window.open = function (open, $) {
 		$('div._actions button', container).on('click', function() {
 			var target = $(this).data('target');
 			$('#'+target).click();
+		});
+	}
+	
+	function toggleView(container, form) {
+		console.log('- show/hide container and original on ESC key');
+		var KEY_ESC = 27;
+		form.hide();
+		container.show();
+		$(popup.document).on('keyup', function(e) {
+			if(e.keyCode !== KEY_ESC) {
+				return;
+			}
+			container.toggle();
+			form.toggle();
 		});
 	}
 	
