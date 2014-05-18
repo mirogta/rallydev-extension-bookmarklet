@@ -11,9 +11,9 @@
  */
 
 console.log = function(doc, log, $) {
-	var icon = $('<div id="_icon">RallyDev Extensions v0.1</div>');
-	icon.appendTo('#footer');
-	icon.css({
+	var title = $('<div id="_title">RallyDev Extensions v0.1</div>');
+	title.appendTo('#footer');
+	title.css({
 		position: 'absolute',
 		bottom: '12px',
 		right: '30px',
@@ -35,11 +35,22 @@ console.log = function(doc, log, $) {
 		height: '100px',
 		overflow: 'auto'
 	});
-
+	
+	var KEY_ESC = 27;
+	logger.hide();
+	$(doc).on('keyup', function(e) {
+		if(e.keyCode !== KEY_ESC) {
+			return;
+		}
+		logger.toggle();
+	});
+	
 	return function (message) {
-		logger.append(message + '<br/>');
-		log.call(console,message);
+		var now = new Date();
+		logger.append('<small>' + now.toISOString() +  '</small>:' + message + '<br/>');
+		log.call(console, message);
+		logger[0].scrollTop = logger[0].scrollHeight;
     };	
 }(window.document, console.log, $);
 
-console.log('Starting Miro\'s RallyDev Extension v0.2');
+console.log('Starting Miro\'s RallyDev Extension v0.1');
