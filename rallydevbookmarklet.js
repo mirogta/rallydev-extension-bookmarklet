@@ -1,17 +1,17 @@
 /*!
- * RallyDev Extension Bookmarklet v0.2
+ * RallyDev Extension Bookmarklet v0.3
  *
  * Copyright 2014 Miroslav Sommer
  * Released under the MIT license
  *
- * Date: 2014-05-16T21:57Z
+ * Date: 2014-05-19T23:00Z
  *
  * Wrap with the following code to use as a bookmarklet:
  * javascript:(function(){...})()
  */
 
 console.log = function(doc, log, $) {
-	var icon = $('<div id="_icon">RallyDev Extensions v0.2</div>');
+	var icon = $('<div id="_icon">RallyDev Extensions v0.3</div>');
 	icon.appendTo('#footer');
 	icon.css({
 		position: 'absolute',
@@ -53,28 +53,57 @@ console.log = function(doc, log, $) {
     };	
 }(window.document, console.log, $);
 
-console.log('Starting Miro\'s RallyDev Extension v0.2');
+console.log('Starting Miro\'s RallyDev Extension v0.3');
+
+/*
+From RallyDev:
+function disableButtons() {
+	var buttons = Ext.query('.ed-btns button');
+	for (var i in buttons) {
+		if (buttons.hasOwnProperty(i)) {
+			buttons[i].disabled = true;
+		}
+	}
+}
+function enableButtons() {
+	var buttons = Ext.query('.ed-btns button');
+	for (var i in buttons) {
+		if (buttons.hasOwnProperty(i)) {
+			buttons[i].disabled = false;
+		}
+	}
+}
+*/
 
 window.open = function (open, $) {
 
-	var popup = null;
-
+	var popup = null,
+		isReady = false;
+	
 	function attachPopupLoadedEvent() {
 		console.log('- attachPopupLoadedEvent');
 		console.log('- popup document: '+popup.document);
-		$(popup.document).ready(function() {
-			console.log('- popup loaded');
-			setTimeout(checkDocumentLoaded,0);
-		});
+		setTimeout(checkDocumentLoaded,100);
 	}
 	
 	function checkDocumentLoaded() {
 		if(popup.document.readyState !== "complete") {
-			console.log('- document not ready, retry');
+			isReady = false;
+			console.log('- document readyState not complete, retry');
 			setTimeout(checkDocumentLoaded,100);
 			return;
 		}
-		onPopupLoaded(popup.jQuery);
+		
+		if(popup.window) {
+			console.log('- popup active, check document readyState');
+			setTimeout(checkDocumentLoaded,1000);
+		}
+		
+		if(isReady === false) {
+			console.log('- document ready');
+			isReady = true;
+			onPopupLoaded(popup.jQuery);
+		}
 	}
 	
 	function onPopupLoaded($) {
@@ -194,9 +223,10 @@ window.open = function (open, $) {
 	}
 	
     return function (url, name, features) {
-		console.log('- Intercepted window.open('+url+','+name+','+features+')');
+		console.log('- intercepted window.open('+url+','+name+','+features+')');
         popup = open.call(window, url, name, features);
 		attachPopupLoadedEvent();
+		//window._popup = popup;
 		return popup;
     };
 }(window.open, $);
