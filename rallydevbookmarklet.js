@@ -1,17 +1,19 @@
 /*!
- * RallyDev Extension Bookmarklet v0.3
+ * RallyDev Extension Bookmarklet v0.4
  *
  * Copyright 2014 Miroslav Sommer
  * Released under the MIT license
  *
  * Date: 2014-05-19T23:00Z
  *
- * Wrap with the following code to use as a bookmarklet:
- * javascript:(function(){...})()
+ * Add this bookmarklet to your browser bookmarks:
+ *
+ * javascript:$.getScript('https://raw.githubusercontent.com/mirogta/rallydev-extension-bookmarklet/master/rallydevbookmarklet.min.js');
+ *
  */
 
 console.log = function(doc, log, $) {
-	var icon = $('<div id="_icon">RallyDev Extensions v0.3</div>');
+	var icon = $('<div id="_icon">RallyDev Extensions v0.4</div>');
 	icon.appendTo('#footer');
 	icon.css({
 		position: 'absolute',
@@ -53,27 +55,7 @@ console.log = function(doc, log, $) {
     };	
 }(window.document, console.log, $);
 
-console.log('Starting Miro\'s RallyDev Extension v0.3');
-
-/*
-From RallyDev:
-function disableButtons() {
-	var buttons = Ext.query('.ed-btns button');
-	for (var i in buttons) {
-		if (buttons.hasOwnProperty(i)) {
-			buttons[i].disabled = true;
-		}
-	}
-}
-function enableButtons() {
-	var buttons = Ext.query('.ed-btns button');
-	for (var i in buttons) {
-		if (buttons.hasOwnProperty(i)) {
-			buttons[i].disabled = false;
-		}
-	}
-}
-*/
+console.log('Starting Miro\'s RallyDev Extension v0.4');
 
 window.open = function (open, $) {
 
@@ -166,6 +148,12 @@ window.open = function (open, $) {
 
 		toggleView(container, form);
 
+		console.log('- enabling underlying buttons');
+		// NOTE: there are also global functions provided by RallyDev: enableButtons() and disableButtons()
+		if($('.ed-btns button').is(':disabled')) {
+			$('.ed-btns button:first').prop('disabled', false);
+		}	
+		
 		console.log('- name buttons');
 		$('._names button', container).on('click', function() {
 			var skill = $(this).data('skill');
@@ -197,7 +185,10 @@ window.open = function (open, $) {
 		console.log('- add action buttons');
 		$('div._actions button', container).on('click', function() {
 			var target = $(this).data('target');
-			$('#'+target).click();
+			// NOTE: $('#'+target).click(); didn't work reliably, because sometimes underlying buttons were disabled
+			// so the safest way is to execute the function attached to their click events
+			// which is done in an obstructive way in HTML so simply...			
+			$('#'+target)[0].onclick();
 		});
 		
 		console.log('- check Ready');
