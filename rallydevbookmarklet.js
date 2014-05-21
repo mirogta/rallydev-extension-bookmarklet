@@ -1,5 +1,5 @@
 /*!
- * RallyDev Extension Bookmarklet v0.4
+ * RallyDev Extension Bookmarklet v0.5
  *
  * Copyright 2014 Miroslav Sommer
  * Released under the MIT license
@@ -13,7 +13,7 @@
  */
 
 console.log = function(doc, log, $) {
-	var icon = $('<div id="_icon">RallyDev Extensions v0.4</div>');
+	var icon = $('<div id="_icon">RallyDev Extensions v0.5</div>');
 	icon.appendTo('#footer');
 	icon.css({
 		position: 'absolute',
@@ -55,7 +55,7 @@ console.log = function(doc, log, $) {
     };	
 }(window.document, console.log, $);
 
-console.log('Starting Miro\'s RallyDev Extension v0.4');
+console.log('Starting Miro\'s RallyDev Extension v0.5');
 
 window.open = function (open, $) {
 
@@ -75,26 +75,27 @@ window.open = function (open, $) {
 			setTimeout(checkDocumentLoaded,100);
 			return;
 		}
+
+		if(popup.window) {
+			console.log('- popup active, check document readyState');
+			setTimeout(checkDocumentLoaded,1000);
+			setTimeout(enableButtons,1000);
+		}
 		
 		if(isReady === false) {
 			console.log('- document ready');
 			isReady = true;
 			onPopupLoaded(popup.jQuery);
 		}
-
-		if(popup.window) {
-			console.log('- popup active, check document readyState');
-			enableButtons(popup.jQuery);
-			setTimeout(checkDocumentLoaded,1000);
-		}
 	}
 	
-	function enableButtons($) {
+	function enableButtons() {
 		console.log('- enabling underlying buttons');
 		// NOTE: there are also global functions provided by RallyDev: enableButtons() and disableButtons()
-		if($('.ed-btns button').is(':disabled')) {
+		if(popup && popup.window && popup.jQuery) {
+			var $ = popup.jQuery;
 			$('.ed-btns button').prop('disabled', false);
-		}	
+		}
 	}
 	
 	function onPopupLoaded($) {
