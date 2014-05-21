@@ -76,23 +76,22 @@ window.open = function (open, $) {
 			return;
 		}
 		
-		if(popup.window) {
-			console.log('- popup active, check document readyState');
-			enableButtons();
-			setTimeout(checkDocumentLoaded,1000);
-		}
-		
 		if(isReady === false) {
 			console.log('- document ready');
 			isReady = true;
 			onPopupLoaded(popup.jQuery);
 		}
+
+		if(popup.window) {
+			console.log('- popup active, check document readyState');
+			enableButtons(popup.jQuery);
+			setTimeout(checkDocumentLoaded,1000);
+		}
 	}
 	
-	function enableButtons() {
+	function enableButtons($) {
 		console.log('- enabling underlying buttons');
 		// NOTE: there are also global functions provided by RallyDev: enableButtons() and disableButtons()
-		var $ = popup.jQuery;
 		if($('.ed-btns button').is(':disabled')) {
 			$('.ed-btns button').prop('disabled', false);
 		}	
