@@ -78,6 +78,7 @@ window.open = function (open, $) {
 		
 		if(popup.window) {
 			console.log('- popup active, check document readyState');
+			enableButtons();
 			setTimeout(checkDocumentLoaded,1000);
 		}
 		
@@ -86,6 +87,15 @@ window.open = function (open, $) {
 			isReady = true;
 			onPopupLoaded(popup.jQuery);
 		}
+	}
+	
+	function enableButtons() {
+		console.log('- enabling underlying buttons');
+		// NOTE: there are also global functions provided by RallyDev: enableButtons() and disableButtons()
+		var $ = popup.jQuery;
+		if($('.ed-btns button').is(':disabled')) {
+			$('.ed-btns button').prop('disabled', false);
+		}	
 	}
 	
 	function onPopupLoaded($) {
@@ -147,12 +157,6 @@ window.open = function (open, $) {
 		var container = $('._container');
 
 		toggleView(container, form);
-
-		console.log('- enabling underlying buttons');
-		// NOTE: there are also global functions provided by RallyDev: enableButtons() and disableButtons()
-		if($('.ed-btns button').is(':disabled')) {
-			$('.ed-btns button:first').prop('disabled', false);
-		}	
 		
 		console.log('- name buttons');
 		$('._names button', container).on('click', function() {
