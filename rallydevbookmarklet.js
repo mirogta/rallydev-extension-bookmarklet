@@ -71,15 +71,14 @@ window.open = function (open, $) {
 	function checkDocumentLoaded() {
 		if(popup.document.readyState !== "complete") {
 			isReady = false;
-			console.log('- document readyState not complete, retry');
+			//console.log('- document readyState not complete, retry');
 			setTimeout(checkDocumentLoaded,100);
 			return;
 		}
 
 		if(popup.window) {
-			console.log('- popup active, check document readyState');
+			//console.log('- popup active, check document readyState');
 			setTimeout(checkDocumentLoaded,1000);
-			setTimeout(enableButtons,1000);
 		}
 		
 		if(isReady === false) {
@@ -188,11 +187,15 @@ window.open = function (open, $) {
 
 		console.log('- add action buttons');
 		$('div._actions button', container).on('click', function() {
+			// show the original (was this causing the bug with disabled buttons?)
+			container.hide();
+			form.show();
+			
 			var target = $(this).data('target');
 			// NOTE: $('#'+target).click(); didn't work reliably, because sometimes underlying buttons were disabled
 			// so the safest way is to execute the function attached to their click events
 			// which is done in an obstructive way in HTML so simply...			
-			$('#'+target)[0].onclick();
+			$('#'+target).click();
 		});
 		
 		console.log('- check Ready');
