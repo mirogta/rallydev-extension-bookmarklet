@@ -4,11 +4,11 @@
  * Copyright 2014 Miroslav Sommer
  * Released under the MIT license
  *
- * Date: 2014-05-19T23:00Z
+ * Date: 2014-06-11T23:00Z
  *
  * Add this bookmarklet to your browser bookmarks:
  *
- * javascript:$.getScript('https://raw.githubusercontent.com/mirogta/rallydev-extension-bookmarklet/master/rallydevbookmarklet.min.js');
+ * javascript:$.getScript('https://rawgit.com/mirogta/rallydev-extension-bookmarklet/master/rallydevbookmarklet.min.js');
  *
  */
 
@@ -16,10 +16,11 @@ console.log = function(doc, log, $) {
 	var icon = $('<div id="_icon">RallyDev Extensions v0.5</div>');
 	icon.appendTo('#footer');
 	icon.css({
-		position: 'absolute',
+		position: 'fixed',
 		bottom: '12px',
 		right: '30px',
 		padding: '2px',
+		background: '#000',
 		color: '#fff',
 		border: '1px inset #aaa'
 	});
@@ -27,7 +28,7 @@ console.log = function(doc, log, $) {
 	var logger = $('<div id="_logger"></div>');
 	logger.appendTo('#footer');
 	logger.css({
-		position: 'absolute',
+		position: 'fixed',
 		bottom: '12px',
 		right: '30px',
 		padding: '4px',
@@ -57,174 +58,102 @@ console.log = function(doc, log, $) {
 
 console.log('Starting Miro\'s RallyDev Extension v0.5');
 
-window.open = function (open, $) {
+(function(Rally) {
 
-	var popup = null,
-		isReady = false;
-	
-	function attachPopupLoadedEvent() {
-		console.log('- attachPopupLoadedEvent');
-		console.log('- popup document: '+popup.document);
-		setTimeout(checkDocumentLoaded,100);
-	}
-	
-	function checkDocumentLoaded() {
-		if(popup.document.readyState !== "complete") {
-			isReady = false;
-			//console.log('- document readyState not complete, retry');
-			setTimeout(checkDocumentLoaded,100);
-			return;
-		}
+	var scope = Rally.getScope();
 
-		if(popup.window) {
-			//console.log('- popup active, check document readyState');
-			setTimeout(checkDocumentLoaded,1000);
-		}
+	function init() {
+		console.log('- Add extensions menu');
 		
-		if(isReady === false) {
-			console.log('- document ready');
-			isReady = true;
-			onPopupLoaded(popup.jQuery);
-		}
+		var extensionsMenuItem = $('<li class="nav-tab" id="_extensionMenuItem"><a href="#/extensions">Extensions</a></li>');
+		$('.nav-bar li').parent().append(extensionsMenuItem);
+		
+		extensionsMenuItem.on('click', function(e) {
+			e.preventDefault();
+			$('.nav-bar li').removeClass('nav-tab-active');
+			//$(this).addClass('nav-tab-active');
+			showExtensionsContent();
+			return false;
+		});
 	}
 	
-	function enableButtons() {
-		console.log('- enabling underlying buttons');
-		// NOTE: there are also global functions provided by RallyDev: enableButtons() and disableButtons()
-		if(popup && popup.window && popup.jQuery) {
-			var $ = popup.jQuery;
-			$('.ed-btns button').prop('disabled', false);
-		}
-	}
-	
-	function onPopupLoaded($) {
-		if(typeof($) === "undefined" || $ === null || $('#itemForm').length === 0) {
-			console.log('- jQuery not ready, retry');
-			setTimeout(checkDocumentLoaded,100);
-			return;
-		}
-
-		console.log('- running enhancemenets');
-		var editorType = $('input[name="editorType"]').val();
-		var editorMode = $('input[name="editorMode"]').val();
-		console.log('- editorType:'+editorType+', editorMode:'+editorMode);
-		if(editorMode === 'create' && editorType === 'task') {
-			onCreateTask($);
-		}
-	}
-	
-	function onCreateTask($) {
-		console.log('- Create Task detected');
-		var form = $('#itemForm');
-		console.log('- form:'+form);
-		var html = '';
-		html += '<div class="_container">';
-		html += '<style type="text/css">';
-		html += '._container {padding:10px;}';
-		html += '._container * {font-size:medium; padding:4px; margin: 4px;}';
-		html += '._container label {width:100px; display:inline-block;}';
-		html += '._container input {width:20px; display:inline-block;}';
-		html += '._container button {width:160px; display:inline-block;}';
-		html += '._container ._title {font-weight:bold; border-bottom: 1px solid #000;}';
-		html += '._container ._names {text-align:center;}';
-		html += '._container ._actions {text-align:center; border-top: 1px solid #000;}';
-		html += '._container ._name {width:500px;}';
-		html += '._container ._help {margin-top:20px; color: #33AA33;}';
-		html += '</style>';
-		html += '<div class="_title">Create Task</div>';
-		html += '<div class="_names">';
-		html += '<button data-skill="Development" data-name="DEV: ">DEV</button>';
-		html += '<button data-skill="Development" data-name="DEV: code review" data-next="true">DEV: code review</button>';
-		html += '<button data-skill="Test" data-name="QA: ">QA</button>';
-		html += '<button data-skill="Test" data-name="QA: test review" data-next="true">QA: test review</button>';
+	function showExtensionsContent() {
+		console.log('- Display extensions content');
+		
+		var projectUrl = 'https://rally1.rallydev.com/slm/webservice/v2.0/project/'+scope.project.ObjectID;
+		
+		var html = '<div class="portlet">';
+		html += '<div class="titlebar"><span>RallyDev Extensions</span></div><br/>';
+		html += '<div>Current Project: <a href="'+projectUrl+'">'+scope.project.Name+'</a></div>';
+		html += '<div>Releases: <select id="_releases"></select></div>';
+		html += '<hr/><div id="_stories"></div>';
 		html += '</div>';
-		html += '<div><label>Name:</label><input type="text" class="_name"/></div>';
-		html += '<div><label>Hours:</label><input type="text" class="_hours"/></div>';
-		html += '<div><label>Ready:</label>&#10004;</div>';
-		html += '<div><label>Skill:</label><span class="_skill"></span></div>';
-		html += '<div class="_actions">';
-		html += '<button data-target="save_and_close_btn">Save and Close</button>';
-		html += '<button data-target="save_and_new_btn">Save and New</button>';
-		html += '<button data-target="save_btn">Save</button>';
-		html += '<button data-target="cancel_btn">Cancel</button>';
-		html += '</div>';
-		html += '<div class="_help">Press Esc key to toggle between the original and optimised view.</div>';
-		html += '</div>';
-		console.log('- adding new form');
-		$(html).insertBefore(form);
-
-		var container = $('._container');
-
-		toggleView(container, form);
 		
-		console.log('- name buttons');
-		$('._names button', container).on('click', function() {
-			var skill = $(this).data('skill');
-			var name = $(this).data('name');
-			var next = $(this).data('next');
-			$('select option[value="'+skill+'"]').parent().val(skill);
-			$('input._name', container).val(name).trigger('keyup').focus();
-			$('span._skill', container).text(skill);
-			if(next) {
-				$('._hours', container).focus();
-			}
-		});
-
-		console.log('- focus on name');
-		$('input._name', container).focus();
-		
-		console.log('- update name');
-		$('input._name', container).on('keyup', function() {
-			var text = $(this).val();
-			$('input[name="name"]').val(text);
-		});
-		
-		console.log('- update estimate and time remaining');
-		$('._hours', container).on('keyup', function() {
-			var text = $(this).val();
-			$('input[name="estimate"],input[name="remaining"]').val(text);
-		});
-
-		console.log('- add action buttons');
-		$('div._actions button', container).on('click', function() {
-			// show the original (was this causing the bug with disabled buttons?)
-			container.hide();
-			form.show();
-			
-			var target = $(this).data('target');
-			// NOTE: $('#'+target).click(); didn't work reliably, because sometimes underlying buttons were disabled
-			// so the safest way is to execute the function attached to their click events
-			// which is done in an obstructive way in HTML so simply...			
-			$('#'+target).click();
-		});
-		
-		console.log('- check Ready');
-		$('input[name="ready"]').prop('checked',true);
-		console.log('- hide Owner row');
-		$('select[name="owner"]').parents('tr').hide();
-		console.log('- pre-select Development skill');
-		$('select option[value="Development"]').parent().val('Development');
+		setTimeout(loadReleases,0);
+		$('#content .portlet').parent().html(html);
+		$('#_releases').on('change', onSelectRelease);
 	}
 	
-	function toggleView(container, form) {
-		console.log('- show/hide container and original on ESC key');
-		var KEY_ESC = 27;
-		form.hide();
-		container.show();
-		$(popup.document).on('keyup', function(e) {
-			if(e.keyCode !== KEY_ESC) {
-				return;
-			}
-			container.toggle();
-			form.toggle();
+	function onSelectRelease() {
+		var selectedRelease = $(this).val();
+		var baseUrl = 'https://rally1.rallydev.com/slm/webservice/v2.0/HierarchicalRequirement';
+		var query = '?query=((Project.Name%20%3D%20BUD)%20AND(Release.ObjectID%20%3D%20'+selectedRelease+'))&shallowFetch=Name,FormattedID,ObjectID,Tasks&pagesize=50&order=Name%20desc';
+		$.getJSON(baseUrl+query, function(data) {
+			var items = [];
+			var list = data.QueryResult.Results;
+			$.each( list, function( key, val ) {
+				var itemUrl = 'https://rally1.rallydev.com/#/'+scope.project.ObjectID+'ud/detail/userstory/'+val.ObjectID;
+				var storyKey = val.FormattedID;
+				items.push('<li id="_'+storyKey+'"><a href="'+itemUrl+'">'+storyKey+'</a> '+val.Name+'</option>');
+				if(val.Tasks && val.Tasks.Count > 0) {
+					setTimeout(function() {
+						loadTasks(storyKey, val.ObjectID);
+					}, 100);
+				}
+			});
+			$('#_stories').html(items.join(""));
 		});
 	}
 	
-    return function (url, name, features) {
-		console.log('- intercepted window.open('+url+','+name+','+features+')');
-        popup = open.call(window, url, name, features);
-		attachPopupLoadedEvent();
-		//window._popup = popup;
-		return popup;
-    };
-}(window.open, $);
+	function loadReleases() {
+		var baseUrl = 'https://rally1.rallydev.com/slm/webservice/v2.0/project/'+scope.project.ObjectID+'/Releases';
+		var query = '?shallowFetch=Name,ObjectID&pagesize=50&order=Date%20desc';
+		$.getJSON(baseUrl+query, function(data) {
+			var items = [];
+			var list = data.QueryResult.Results;
+			items.push('<option>Please select...</option>');
+			$.each( list, function( key, val ) {
+				items.push('<option value="'+val.ObjectID+'">'+val.Name+'</option>');
+			});
+			$('#_releases').html(items.join(""));
+		});
+	}
+	
+	function loadTasks(storyKey, storyId) {
+		
+		var url = 'https://rally1.rallydev.com/slm/webservice/v2.0/HierarchicalRequirement/'+storyId+'/Tasks';
+		$.getJSON(url, function(data) {
+			var items = [];
+			var list = data.QueryResult.Results;
+			items.push('<ul>');
+			$.each( list, function( key, val ) {
+				items.push('<li>'+val.Name+'</li>');
+			});
+			items.push('</ul>');
+			$('#_'+storyKey).append(items.join(""));
+		});
+	}
+	
+	function reset() {
+		$('#_extensionMenuItem').remove();
+	}
+	
+	init();
+	
+	window.extensions = {
+		init: init,
+		reset: reset,
+		loadReleases: loadReleases
+	};
+
+})(Rally);
