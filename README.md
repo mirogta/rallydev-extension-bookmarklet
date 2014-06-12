@@ -14,6 +14,10 @@ Tested in and developed for Chrome.
 Changelog
 =========
 
+2014-05-20 v0.5
+* Different approach to interact with RallyDev using it's API on https://rally1.rallydev.com/slm/doc/webservice/
+  Added new menu item "Extensions". At the moment list releases, stories and tasks under the active project.
+
 2014-05-20 v0.4
 * Fixed issue where underlying buttons were disabled after saving a task using "Save and New"
 * Updated help on how to add the bookmarklet using $.getScript, so that the latest version of bookmarklet is always used
