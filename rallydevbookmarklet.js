@@ -66,7 +66,11 @@ console.log = function(doc, log, $) {
 
 console.log('Starting Miro\'s RallyDev Extension v0.6');
 
-(function(Rally) {
+window.RallyExtensions = {
+	timeout: 60 // seconds - 1min by default
+};
+
+(function(Rally, RallyExtensions) {
 
 	var CSS_CUSTOM = '<link href="https://rawgit.com/mirogta/rallydev-extension-bookmarklet/master/rallydevbookmarklet.css" rel="stylesheet" type="text/css">',
 		CSS_FONT = '<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">',
@@ -119,7 +123,8 @@ console.log('Starting Miro\'s RallyDev Extension v0.6');
 			lastLink.click();
 		}
 		
-		setTimeout(refreshCurrentPage, 5000);
+		var timeout = RallyExtensions.timeout * 1000;
+		setTimeout(refreshCurrentPage, timeout);
 	}
 	
 	function loadStyle() {
@@ -206,4 +211,4 @@ console.log('Starting Miro\'s RallyDev Extension v0.6');
 		loadReleases: loadReleases
 	};
 
-})(Rally);
+})(Rally,RallyExtensions);
