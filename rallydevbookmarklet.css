@@ -1,3 +1,15 @@
-#mydash_portlet .titlebar .title {
+#mydash_portlet {
+	padding: 0 10px;
+}
+#dashboard-container {
+	padding: 0;
+}
+#mydash_portlet .titlebar {
+	position: absolute;
+	right: 140px;
+	top: 8px;
+}
+#mydash_portlet .titlebar .title,
+#mydash_portlet #dashboardHelpLink {
 	display:none;
 }
