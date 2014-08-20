@@ -1,5 +1,5 @@
 /*!
- * RallyDev Extension Bookmarklet v0.5
+ * RallyDev Extension Bookmarklet v0.6
  *
  * Copyright 2014 Miroslav Sommer
  * Released under the MIT license
@@ -21,7 +21,7 @@ https://rally1.rallydev.com/slm/webservice/v2.0/HierarchicalRequirement/19570286
 */
  
 console.log = function(doc, log, $) {
-	var icon = $('<div id="_icon">RallyDev Extensions v0.5</div>');
+	var icon = $('<div id="_icon">RallyDev Extensions v0.6</div>');
 	icon.appendTo('#footer');
 	icon.css({
 		position: 'fixed',
@@ -64,15 +64,15 @@ console.log = function(doc, log, $) {
     };	
 }(window.document, console.log, $);
 
-console.log('Starting Miro\'s RallyDev Extension v0.5');
+console.log('Starting Miro\'s RallyDev Extension v0.6');
 
 (function(Rally) {
 
 	var CSS_CUSTOM = '<link href="https://rawgit.com/mirogta/rallydev-extension-bookmarklet/master/rallydevbookmarklet.css" rel="stylesheet" type="text/css">',
-		CSS_FONT = '<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">';
-
-	var scope = Rally.getScope();
-
+		CSS_FONT = '<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">',
+		scope = Rally.getScope(),
+		isRefreshActive = false;
+	
 	function init() {
 
 		console.log('- Adding custom styles');
@@ -94,7 +94,6 @@ console.log('Starting Miro\'s RallyDev Extension v0.5');
 		});
 
 		var refreshMenuItem = $('<li class="nav-tab" id="_refreshMenuItem"><i class="fa fa-refresh"></i></li>');
-		var isRefreshActive = false;
 		navbar.append(refreshMenuItem);
 		
 		var refreshContent = $('#_refreshMenuItem i');
@@ -104,17 +103,20 @@ console.log('Starting Miro\'s RallyDev Extension v0.5');
 			e.preventDefault();
 			isRefreshActive = !isRefreshActive;
 			refreshContent.html(isRefreshActive ? '...' : '');
-			if(isRefreshActive === true) {
-				refreshCurrentPage();
-			}
+			refreshCurrentPage();
 		});
 	}
 	
 	function refreshCurrentPage() {
+		if(isRefreshActive === false) {
+			return;
+		}
+		
 		var link = $('a[href="'+document.location.hash+'"]');
 		
-		if(link && link[0] && link[0].click) {
-			link[0].click();
+		if(link && link.length > 0) {
+			var lastLink = link[link.length-1];
+			lastLink.click();
 		}
 		
 		setTimeout(refreshCurrentPage, 5000);
