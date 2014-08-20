@@ -12,6 +12,14 @@
  *
  */
 
+/*
+Urls:
+https://rally1.rallydev.com
+https://rally1.rallydev.com/slm/webservice/v2.0/HierarchicalRequirement?query=((Project.Name%20%3D%20BUD)%20AND(Release.ObjectID%20%3D%2018855759752))&fetch=Name,FormattedID,ObjectID,Tasks&pagesize=1&order=Name%20desc
+https://rally1.rallydev.com/slm/webservice/v2.0/HierarchicalRequirement?query=((Project.Name%20%3D%20BUD)%20AND(Release.ObjectID%20%3D%2018855759752))&shallowFetch=Name,FormattedID,ObjectID,Task,Release&pagesize=50&order=Name%20desc
+https://rally1.rallydev.com/slm/webservice/v2.0/HierarchicalRequirement/19570286926/Tasks
+*/
+ 
 console.log = function(doc, log, $) {
 	var icon = $('<div id="_icon">RallyDev Extensions v0.5</div>');
 	icon.appendTo('#footer');
@@ -60,9 +68,15 @@ console.log('Starting Miro\'s RallyDev Extension v0.5');
 
 (function(Rally) {
 
+	var CSS_URL = "https://rawgit.com/mirogta/rallydev-extension-bookmarklet/master/rallydevbookmarklet.css";
+
 	var scope = Rally.getScope();
 
 	function init() {
+
+		console.log('- Adding custom styles');
+		loadStyle();
+		
 		console.log('- Add extensions menu');
 		
 		var extensionsMenuItem = $('<li class="nav-tab" id="_extensionMenuItem"><a href="#/extensions">Extensions</a></li>');
@@ -75,6 +89,10 @@ console.log('Starting Miro\'s RallyDev Extension v0.5');
 			showExtensionsContent();
 			return false;
 		});
+	}
+	
+	function loadStyle() {
+		$('head').append('<link rel="stylesheet" type="text/css" href="'+CSS_URL+'">');
 	}
 	
 	function showExtensionsContent() {
