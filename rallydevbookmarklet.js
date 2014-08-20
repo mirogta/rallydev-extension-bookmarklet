@@ -68,7 +68,8 @@ console.log('Starting Miro\'s RallyDev Extension v0.5');
 
 (function(Rally) {
 
-	var CSS_URL = "https://rawgit.com/mirogta/rallydev-extension-bookmarklet/master/rallydevbookmarklet.css";
+	var CSS_CUSTOM = '<link href="https://rawgit.com/mirogta/rallydev-extension-bookmarklet/master/rallydevbookmarklet.css" rel="stylesheet" type="text/css">',
+		CSS_FONT = '<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">';
 
 	var scope = Rally.getScope();
 
@@ -78,10 +79,12 @@ console.log('Starting Miro\'s RallyDev Extension v0.5');
 		loadStyle();
 		
 		console.log('- Add extensions menu');
+
+		var navbar = $('.nav-bar li').parent();
 		
 		var extensionsMenuItem = $('<li class="nav-tab" id="_extensionMenuItem"><a href="#/extensions">Extensions</a></li>');
-		$('.nav-bar li').parent().append(extensionsMenuItem);
-		
+		navbar.append(extensionsMenuItem);
+
 		extensionsMenuItem.on('click', function(e) {
 			e.preventDefault();
 			$('.nav-bar li').removeClass('nav-tab-active');
@@ -89,10 +92,37 @@ console.log('Starting Miro\'s RallyDev Extension v0.5');
 			showExtensionsContent();
 			return false;
 		});
+
+		var refreshMenuItem = $('<li class="nav-tab" id="_refreshMenuItem"><i class="fa fa-refresh"></i></li>');
+		var isRefreshActive = false;
+		navbar.append(refreshMenuItem);
+		
+		var refreshContent = $('#_refreshMenuItem i');
+		refreshMenuItem.data('active', false);
+		
+		refreshMenuItem.on('click', function(e) {
+			e.preventDefault();
+			isRefreshActive = !isRefreshActive;
+			refreshContent.html(isRefreshActive ? '...' : '');
+			if(isRefreshActive === true) {
+				refreshCurrentPage();
+			}
+		});
+	}
+	
+	function refreshCurrentPage() {
+		var link = $('a[href="'+document.location.hash+'"]');
+		
+		if(link && link[0] && link[0].click) {
+			link[0].click();
+		}
+		
+		setTimeout(refreshCurrentPage, 5000);
 	}
 	
 	function loadStyle() {
-		$('head').append('<link rel="stylesheet" type="text/css" href="'+CSS_URL+'">');
+		$('head').append(CSS_FONT);
+		$('head').append(CSS_CUSTOM);
 	}
 	
 	function showExtensionsContent() {
