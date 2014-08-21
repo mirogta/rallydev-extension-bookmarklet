@@ -14,6 +14,9 @@ Tested in and developed for Chrome.
 Changelog
 =========
 
+2014-08-20 v0.6
+* Added toggle refresh menu item. Reloads the current page (selected menu item) every 10 minutes when active.
+
 2014-05-20 v0.5
 * Different approach to interact with RallyDev using it's API on https://rally1.rallydev.com/slm/doc/webservice/
   Added new menu item "Extensions". At the moment list releases, stories and tasks under the active project.

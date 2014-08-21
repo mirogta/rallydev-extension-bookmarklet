@@ -13,3 +13,7 @@
 #mydash_portlet #dashboardHelpLink {
 	display:none;
 }
+
+#_refreshMenuItem {
+	cursor: pointer;
+}

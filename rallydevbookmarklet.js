@@ -67,7 +67,7 @@ console.log = function(doc, log, $) {
 console.log('Starting Miro\'s RallyDev Extension v0.6');
 
 window.RallyExtensions = {
-	timeout: 60 // seconds - 1min by default
+	timeout: 10 * 60 * 1000 // milliseconds - 10 min by default
 };
 
 (function(Rally, RallyExtensions) {
@@ -106,7 +106,7 @@ window.RallyExtensions = {
 		refreshMenuItem.on('click', function(e) {
 			e.preventDefault();
 			isRefreshActive = !isRefreshActive;
-			refreshContent.html(isRefreshActive ? '...' : '');
+			refreshContent.html(isRefreshActive ? '&hellip;' : '');
 			refreshCurrentPage();
 		});
 	}
@@ -123,7 +123,7 @@ window.RallyExtensions = {
 			lastLink.click();
 		}
 		
-		var timeout = RallyExtensions.timeout * 1000;
+		var timeout = RallyExtensions.timeout;
 		setTimeout(refreshCurrentPage, timeout);
 	}
 	
